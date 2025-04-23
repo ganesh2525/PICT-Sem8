@@ -13,14 +13,14 @@ inline void gpuAssert(cudaError_t code, const char *file, int line) {
 }
 
 // Sequential vector addition
-void vectorAddSequential(float *a, float *b, float *c, int n) {
+void vectorAddSequential(int *a, int *b, int *c, int n) {
     for (int i = 0; i < n; i++) {
         c[i] = a[i] + b[i];
     }
 }
 
 // CUDA kernel for parallel vector addition
-__global__ void vectorAddParallel(float *a, float *b, float *c, int n) {
+__global__ void vectorAddParallel(int *a, int *b, int *c, int n) {
     int idx = blockDim.x * blockIdx.x + threadIdx.x;
     if (idx < n) {
         c[idx] = a[idx] + b[idx];
@@ -28,24 +28,24 @@ __global__ void vectorAddParallel(float *a, float *b, float *c, int n) {
 }
 
 int main() {
-    int n = 1 << 10; // 1024 elements
-    size_t size = n * sizeof(float);
+    int n = 1 << 24; // 1024 elements
+    size_t size = n * sizeof(int);
 
     // Host allocations
-    float *h_a = (float*)malloc(size);
-    float *h_b = (float*)malloc(size);
-    float *h_c = (float*)malloc(size);
-    float *h_c_parallel = (float*)malloc(size);
+    int *h_a = (int*)malloc(size);
+    int *h_b = (int*)malloc(size);
+    int *h_c = (int*)malloc(size);
+    int *h_c_parallel = (int*)malloc(size);
 
     // Initialize host vectors
     srand(time(0));
     for (int i = 0; i < n; i++) {
-        h_a[i] = 1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 19.0f));
-        h_b[i] = 1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 19.0f));
+        h_a[i] = rand() % 100;
+        h_b[i] = rand() % 100;
     }
 
     // Device allocations
-    float *d_a, *d_b, *d_c;
+    int *d_a, *d_b, *d_c;
     CUDA_CHECK(cudaMalloc(&d_a, size));
     CUDA_CHECK(cudaMalloc(&d_b, size));
     CUDA_CHECK(cudaMalloc(&d_c, size));
@@ -77,14 +77,14 @@ int main() {
     CUDA_CHECK(cudaMemcpy(h_c_parallel, d_c, size, cudaMemcpyDeviceToHost));
 
     // Output sample results
-    cout << "\nIndex\t\th_a\t\th_b\t\th_c (Seq)\t\th_c_parallel (CUDA)" << endl;
-    for (int i = 0; i < n; i++) {
-        cout << i << "\t\t" 
-             << h_a[i] << "\t" 
-             << h_b[i] << "\t" 
-             << h_c[i] << "\t\t" 
-             << h_c_parallel[i] << endl;
-    }
+    // cout << "\nIndex\t\th_a\th_b\t\th_c (Seq)\th_c_parallel (CUDA)" << endl;
+    // for (int i = 0; i < n; i++) {
+    //     cout << i << "\t\t"
+    //          << h_a[i] << "\t"
+    //          << h_b[i] << "\t\t"
+    //          << h_c[i] << "\t\t"
+    //          << h_c_parallel[i] << endl;
+    // }
 
     // Free memory
     CUDA_CHECK(cudaFree(d_a));
@@ -97,6 +97,7 @@ int main() {
 
     return 0;
 }
+
 
 // %%writefile vector_addition.cu
 // !nvcc -arch=sm_75 vector_addition.cu -o vector_addition
