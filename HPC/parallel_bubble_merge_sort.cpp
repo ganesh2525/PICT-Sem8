@@ -74,7 +74,7 @@ void printArray(const vector<int>& arr) {
 
 // Main Function
 int main() {
-    const int SIZE = 10000;
+    const int SIZE = 100000;
     vector<int> arr(SIZE);
     for(int i = 0; i < SIZE; i++) arr[i] = rand() % 10000;
 
@@ -112,3 +112,6 @@ int main() {
 
     return 0;
 }
+
+// g++ -o sorting parallel_bubble_merge_sort.cpp -fopenmp
+// ./sorting

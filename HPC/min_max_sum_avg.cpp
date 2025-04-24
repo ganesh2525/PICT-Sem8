@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <chrono>
 #include <omp.h>
-
 using namespace std;
 
 // Sequential computation
@@ -35,6 +34,13 @@ void parallel_operations(const vector<int>& arr, int& min_val, int& max_val, int
     avg = static_cast<double>(sum) / n;
 }
 
+void printVector(const vector<int>& arr) {
+    cout << "Array Elements:\n";
+    for (int i = 0; i < arr.size(); ++i) {
+        cout << arr[i] << " ";
+    }
+}
+
 int main() {
     // Generate a large vector with random numbers
     int n = 1000000;
@@ -42,6 +48,7 @@ int main() {
     for (int i = 0; i < n; ++i) {
         arr[i] = rand() % 1000 + 1;
     }
+    // printVector(arr);
 
     int min_val, max_val, sum;
     double avg;
@@ -52,7 +59,7 @@ int main() {
     auto end = chrono::high_resolution_clock::now();
     chrono::duration<double> sequential_time = end - start;
 
-    cout << "Sequential Results:" << endl;
+    cout << "\nSequential Results:" << endl;
     cout << "Min: " << min_val << ", Max: " << max_val << ", Sum: " << sum << ", Average: " << avg << endl;
     cout << "Time taken for sequential: " << sequential_time.count() << " seconds" << endl;
 
@@ -65,7 +72,7 @@ int main() {
     end = chrono::high_resolution_clock::now();
     chrono::duration<double> parallel_time = end - start;
 
-    cout << "Parallel Results:" << endl;
+    cout << "\nParallel Results:" << endl;
     cout << "Min: " << min_val << ", Max: " << max_val << ", Sum: " << sum << ", Average: " << avg << endl;
     cout << "Time taken for parallel: " << parallel_time.count() << " seconds" << endl;
 
